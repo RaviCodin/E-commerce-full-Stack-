@@ -60,7 +60,7 @@ exports.getAllProducts = catchAsyncError( async (req,resp,next)=>{
     
     apifeature.pagination(resultPerPage);
     
-     products = await apifeature.query.clone();
+     products = await apifeature.query;
     //  products = await apifeature.query;
     // .pagination(resultPerPage);
 resp.status(200).json({
