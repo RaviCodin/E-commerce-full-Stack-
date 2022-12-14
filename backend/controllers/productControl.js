@@ -67,7 +67,7 @@ resp.status(200).json({
     products,
     productCount,
     resultPerPage,
-//     filterProductCount,
+    filterProductCount:10,
 
 })
 });
