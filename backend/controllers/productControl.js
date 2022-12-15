@@ -45,30 +45,29 @@ exports.createProduct = catchAsyncError( async (req,resp,next)=>{
 //get all products
 exports.getAllProducts = catchAsyncError( async (req,resp,next)=>{
     // return next(new ErrorHandler("This Error handler by me",500));
-    const resultPerPage =3;
+    const resultPerPage =10;
     const productCount = await Product.countDocuments();
 
     const apifeature = new Apifeature(Product.find(), req.query )
     .search()
-    .filter()
-
+    .filter().pagination(resultPerPage)
+   
     let products = await apifeature.query
     
     // console.log("products:", products)
 
-    let filterProductCount = products.length;
+//     let filterProductCount = products.length;
     
-    apifeature.pagination(resultPerPage);
+//     apifeature.pagination(resultPerPage);
     
-     products = await apifeature.query.clone();
-    //  products = await apifeature.query;
-    // .pagination(resultPerPage);
+//     products = await apifeature.query;
+
 resp.status(200).json({
     success:true,
     products,
     productCount,
     resultPerPage,
-    filterProductCount,
+    filterProductCount:10,
 
 })
 });
