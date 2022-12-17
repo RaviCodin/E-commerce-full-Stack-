@@ -55,6 +55,9 @@ const productSchma = new mongoose.Schema({
             ref:"User",
             required:true
         },
+        url:{
+            type:String
+        },
         name:{
             type:String,
             required:true

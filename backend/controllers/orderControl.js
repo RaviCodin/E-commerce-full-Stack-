@@ -14,9 +14,9 @@ exports.newOrder = catchAsyncError(async (req, resp, next) => {
     totalPrice,
     users,
   } = req.body;
-  
-  console.log(users)
-  
+
+  console.log(users);
+
   const order = await Order.create({
     shippingInfo,
     orderItems,
@@ -28,117 +28,117 @@ exports.newOrder = catchAsyncError(async (req, resp, next) => {
     users,
     paidAt: Date.now(),
     creatAt: Date.now(),
-    user:req.user._id
-});
+    user: req.user._id,
+  });
 
-
-resp.status(201).json({
+  resp.status(201).json({
     success: true,
     order,
+  });
 });
-
-});
-
-
 
 // get single order
-exports.getSingleOrder = catchAsyncError(async (req, res, next)=>{
+exports.getSingleOrder = catchAsyncError(async (req, res, next) => {
   // console.log("okey...",req.params.id)
-  const order = await Order.findById(req.params.id)
+  const order = await Order.findById(req.params.id);
 
-  if(!order){
+  if (!order) {
     next(new ErrorHandler("Order not found with this id", 404));
   }
 
   res.status(200).json({
-    success:true,
-    order
+    success: true,
+    order,
   });
 });
 
-
 // get logged in user orders
-exports.myOrders = catchAsyncError(async (req, res, next)=>{
-  const orders = await Order.find({ user: req.user._id })
+exports.myOrders = catchAsyncError(async (req, res, next) => {
+  const orders = await Order.find({
+    'users._id' : req.user._id},
+  );
+
+  // console.log(req.user._id, orders);
+
+  if (!orders) {
+    next(new ErrorHandler("Order not found", 404));
+  }
 
   res.status(200).json({
-    success:true,
-    orders
-  })
+    success: true,
+    orders,
+  });
 });
 
 // get all orders -- admin
-exports.getAllOrders = catchAsyncError(async (req, res, next)=>{
-  const orders = await Order.find()
+exports.getAllOrders = catchAsyncError(async (req, res, next) => {
+  const orders = await Order.find();
 
   let totalAmount = 0;
-  orders.forEach((order)=>{
-    totalAmount+=order.totalPrice;
-  })
+  orders.forEach((order) => {
+    totalAmount += order.totalPrice;
+  });
   res.status(200).json({
-    success:true,
+    success: true,
     totalAmount,
-    orders
-  })
+    orders,
+  });
 });
 
 // update orders Status-- admin
-exports.updateOrder = catchAsyncError(async (req, res, next)=>{
-  const order = await Order.findById(req.params.id)
-  
-  if(!order){
+exports.updateOrder = catchAsyncError(async (req, res, next) => {
+  const order = await Order.findById(req.params.id);
+
+  if (!order) {
     next(new ErrorHandler("Order not found with this id", 404));
   }
-  
-  if(order.orderStatus==="Delivered"){
-    return next(new ErrorHandler("You have already Delivered this order ",404))
+
+  if (order.orderStatus === "Delivered") {
+    return next(
+      new ErrorHandler("You have already Delivered this order ", 404)
+    );
   }
-  
- if(req.body.status === "Shipped"){
-  order.orderItems.forEach(async (order)=>{
-    await updateStock(order.product, order.quantity)
-  });
- }
- 
+
+  if (req.body.status === "Shipped") {
+    order.orderItems.forEach(async (order) => {
+      await updateStock(order.product, order.quantity);
+    });
+  }
 
   order.orderStatus = req.body.status;
 
-  if(req.body.status === "Delivered"){
+  if (req.body.status === "Delivered") {
     order.deliveredAt = Date.now();
   }
-  
-  await order.save({ validateBeforeSave:false })
-  console.log("ok...UpdateOrder")
+
+  await order.save({ validateBeforeSave: false });
+  console.log("ok...UpdateOrder");
   res.status(200).json({
-    success:true,
+    success: true,
     // totalAmount,
-    order
-  })
+    order,
+  });
 });
 
-async function updateStock(id, quantity){
+async function updateStock(id, quantity) {
   const product = await Product.findById(id);
 
   product.stock -= quantity;
 
-  await product.save({ validateBeforeSave:false })
+  await product.save({ validateBeforeSave: false });
 }
 
-
-
 // delete order -- admin
-exports.deleteOrder = catchAsyncError(async (req, res, next)=>{
-
-  const order = await Order.findById(req.params.id)
+exports.deleteOrder = catchAsyncError(async (req, res, next) => {
+  const order = await Order.findById(req.params.id);
   // console.log("order deleted")
 
-  if(!order){
+  if (!order) {
     next(new ErrorHandler("Order not found with this id", 404));
   }
   await order.remove();
 
   res.status(200).json({
-    success:true,
-   
-  })
+    success: true,
+  });
 });

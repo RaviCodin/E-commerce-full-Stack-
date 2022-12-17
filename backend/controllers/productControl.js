@@ -45,29 +45,29 @@ exports.createProduct = catchAsyncError( async (req,resp,next)=>{
 //get all products
 exports.getAllProducts = catchAsyncError( async (req,resp,next)=>{
     // return next(new ErrorHandler("This Error handler by me",500));
-    const resultPerPage =10;
+    const resultPerPage =4;
     const productCount = await Product.countDocuments();
 
     const apifeature = new Apifeature(Product.find(), req.query )
     .search()
-    .filter().pagination(resultPerPage)
-   
+    .filter().pagination(resultPerPage);
+
     let products = await apifeature.query
     
-    // console.log("products:", products)
+  
 
-//     let filterProductCount = products.length;
+    // let filterProductCount = products.length;
     
-//     apifeature.pagination(resultPerPage);
+    // apifeature.pagination(resultPerPage);
     
-//     products = await apifeature.query;
-
+    //  products = await apifeature.query.clone();
+    
 resp.status(200).json({
     success:true,
     products,
     productCount,
     resultPerPage,
-    filterProductCount:10,
+    // filterProductCount,
 
 })
 });
@@ -185,12 +185,13 @@ exports.deleteProduct = catchAsyncError( async (req,resp,next)=>{
 // create review and update review
 
 exports.createProductReview = catchAsyncError(async (req, resp, next)=>{
-    const {productId,comments,rating} = req.body;
-    
+    const {productId,comments,rating,url} = req.body;
+    console.log(url)
     const review = {
         user:req.user._id,
         name:req.user.name,
         rating: Number(rating),
+        url,
         comments
     }
     
